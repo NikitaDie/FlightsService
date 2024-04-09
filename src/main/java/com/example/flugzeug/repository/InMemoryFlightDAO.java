@@ -30,25 +30,25 @@ public class InMemoryFlightDAO
                 .orElse(null);
     }
 
-    public void updateFlight(Flight flight) {
+    public boolean updateFlight(Flight flight) {
         var flightIndex = IntStream.range(0, FLIGHTS.size())
                 .filter(index -> FLIGHTS.get(index).getName().equals(flight.getName()))
                 .findFirst()
                 .orElse(-1);
 
         if (flightIndex == -1)
-            return;
-            //todo: throw exception
+            return false;
 
         FLIGHTS.set(flightIndex, flight);
+        return true;
     }
 
-    public void deleteFlight(String name) {
+    public boolean deleteFlight(String name) {
         var flight = findByName(name);
         if (flight == null)
-            return;
-            //throw exception
+            return false;
 
         FLIGHTS.remove(flight);
+        return true;
     }
 }

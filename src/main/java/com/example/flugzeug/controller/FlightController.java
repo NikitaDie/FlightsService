@@ -34,24 +34,30 @@ public class FlightController
     @ResponseBody
     public FlightApi getFlight(@PathVariable String flightName)
     {
-        return service.getFlightByName(flightName);
+        var response = service.getFlightByName(flightName);
+        if (response != null)
+            return response;
+
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
     @PutMapping("/update-flight")
     public void updateFlight(@RequestBody FlightApi updatedFlight)
     {
-        service.updateFlight(updatedFlight);
+        if (!service.updateFlight(updatedFlight))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
 
     @DeleteMapping("/{flightName}")
     public void deleteFlight(@PathVariable String flightName)
     {
-        service.deleteFlight(flightName);
+        if (!service.deleteFlight(flightName))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
 
 
     @PutMapping("book/{flightName}")
-    public void bucheFlug(@PathVariable String flightName, @RequestParam String sitplace)
+    public void bookFlug(@PathVariable String flightName, @RequestParam String sitplace)
     {
         try {
             service.bookFlight(flightName, sitplace);

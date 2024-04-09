@@ -33,15 +33,15 @@ public class InMemoryFlightService implements IFlightService
     }
 
     @Override
-    public void updateFlight(FlightApi flight)
+    public boolean updateFlight(FlightApi flight)
     {
-        repository.updateFlight(new Flight(flight));
+        return repository.updateFlight(new Flight(flight));
     }
 
     @Override
-    public void deleteFlight(String name)
+    public boolean deleteFlight(String name)
     {
-        repository.deleteFlight(name);
+        return repository.deleteFlight(name);
     }
 
     @Override

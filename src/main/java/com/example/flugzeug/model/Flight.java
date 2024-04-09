@@ -2,29 +2,20 @@ package com.example.flugzeug.model;
 
 import com.example.flugzeug.exception.NotAvailableException;
 import com.example.flugzeug.exception.WrongPositionException;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.*;
-import org.antlr.v4.runtime.misc.NotNull;
 
 
 import java.security.InvalidParameterException;
 import java.util.*;
+import java.util.stream.Collectors;
 
-/*@Entity*/
-@Table(name = "flights")
+
 public class Flight
 {
-    @Id
-    @GeneratedValue
     private Long id;
-    @NotNull
     private String name;
 
     List<Sitplace> sitplaces;
 
-    @JsonIgnore
     public Flight(String name, boolean[][] sitsplan)
     {
         this.name = name;
@@ -35,7 +26,9 @@ public class Flight
     public Flight (FlightApi flightApi)
     {
         this.name = flightApi.getName();
-        this.sitplaces = flightApi.getSeats();
+        this.sitplaces = flightApi.getSeats().stream()
+                .map(Sitplace::new)
+                .collect(Collectors.toList());
     }
 
     public FlightApi toApi()

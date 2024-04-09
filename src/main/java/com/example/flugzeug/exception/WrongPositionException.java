@@ -1,6 +1,6 @@
 package com.example.flugzeug.exception;
 
-public class WrongPositionException extends FlugzeugException
+public class WrongPositionException extends FlightsException
 {
     public WrongPositionException()
     {

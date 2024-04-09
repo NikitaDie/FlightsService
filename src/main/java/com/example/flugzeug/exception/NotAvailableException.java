@@ -1,6 +1,6 @@
 package com.example.flugzeug.exception;
 
-public class NotAvailableException extends FlugzeugException
+public class NotAvailableException extends FlightsException
 {
     public NotAvailableException()
     {
