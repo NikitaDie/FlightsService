@@ -1,6 +1,8 @@
 package com.example.flugzeug.repository;
 
 import com.example.flugzeug.model.Flight;
+import com.example.flugzeug.model.FlightApi;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -30,25 +32,23 @@ public class InMemoryFlightDAO
                 .orElse(null);
     }
 
-    public boolean updateFlight(Flight flight) {
+    public void updateFlight(Flight flight) {
         var flightIndex = IntStream.range(0, FLIGHTS.size())
-                .filter(index -> FLIGHTS.get(index).getName().equals(flight.getName()))
+                .filter(index -> FLIGHTS.get(index).getId().equals(flight.getId()))
                 .findFirst()
                 .orElse(-1);
 
         if (flightIndex == -1)
-            return false;
+            throw new EntityNotFoundException(String.format("Flight was not found for parameters during updating {name=%s}", flight.getName()));
 
         FLIGHTS.set(flightIndex, flight);
-        return true;
     }
 
-    public boolean deleteFlight(String name) {
+    public void deleteFlight(String name) {
         var flight = findByName(name);
         if (flight == null)
-            return false;
+            throw new EntityNotFoundException(String.format("Flight was not found for parameters during deleting {name=%s}", name));
 
         FLIGHTS.remove(flight);
-        return true;
     }
 }

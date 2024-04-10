@@ -20,7 +20,7 @@ public class FlightController
         return service.getAllFlights();
     }
 
-    @PostMapping("/create-flight")
+    @PostMapping
     public void createFlight(@RequestBody FlightApi newFlight)
     {
         service.createFlight(newFlight);
@@ -33,7 +33,7 @@ public class FlightController
         return service.getFlightApiByName(flightName);
     }
 
-    @PutMapping("/update-flight")
+    @PutMapping
     public void updateFlight(@RequestBody FlightApi updatedFlight)
     {
         service.updateFlight(updatedFlight);
@@ -46,7 +46,7 @@ public class FlightController
     }
 
 
-    @PutMapping("book/{flightName}")
+    @PutMapping("{flightName}/book")
     public void bookFlight(@PathVariable String flightName, @RequestParam String sitplace)
     {
         service.bookFlight(flightName, sitplace);
