@@ -5,6 +5,7 @@ import com.example.flugzeug.exception.WrongPositionException;
 import com.example.flugzeug.model.FlightApi;
 import com.example.flugzeug.service.IFlightService;
 import com.example.flugzeug.service.InMemoryFlightService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,7 +17,8 @@ import java.util.List;
 @RequestMapping("/api/v1/flights")
 public class FlightController
 {
-    private final IFlightService service = new InMemoryFlightService();
+    @Autowired
+    private IFlightService service;
 
     @GetMapping
     public List<FlightApi> getFlights()
@@ -57,7 +59,7 @@ public class FlightController
 
 
     @PutMapping("book/{flightName}")
-    public void bookFlug(@PathVariable String flightName, @RequestParam String sitplace)
+    public void bookFlight(@PathVariable String flightName, @RequestParam String sitplace)
     {
         try {
             service.bookFlight(flightName, sitplace);

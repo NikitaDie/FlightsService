@@ -2,23 +2,23 @@ package com.example.flugzeug.model;
 
 public class Sitplace
 {
-    private String name;
+    private final String name;
 
     private boolean isReserved;
-
-    Sitplace() { }
 
     Sitplace(Position position)
     {
         name = positionToPlace(position);
     }
 
-    public String getName() {
-        return name;
+    Sitplace(SitplaceApi sitplaceApi)
+    {
+        this.name = sitplaceApi.getName();
+        this.isReserved = sitplaceApi.isReserved();
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getName() {
+        return name;
     }
 
     public boolean isReserved() {
@@ -38,11 +38,6 @@ public class Sitplace
         int x = LetterToNumber(name.charAt(1));
         int y = name.charAt(0) - '0';
         return new Position(x, y);
-    }
-
-    public void setPosition(Position position)
-    {
-        name = positionToPlace(position);
     }
 
     private static int LetterToNumber(char buchstabe)

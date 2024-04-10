@@ -3,6 +3,7 @@ package com.example.flugzeug.service;
 import com.example.flugzeug.model.Flight;
 import com.example.flugzeug.model.FlightApi;
 import com.example.flugzeug.repository.InMemoryFlightDAO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,7 +12,8 @@ import java.util.stream.Collectors;
 @Service
 public class InMemoryFlightService implements IFlightService
 {
-    private final InMemoryFlightDAO repository = new InMemoryFlightDAO();
+    @Autowired
+    private InMemoryFlightDAO repository;
 
     @Override
     public List<FlightApi> getAllFlights() {

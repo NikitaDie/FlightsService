@@ -10,7 +10,11 @@ spring:
     console:
       enabled: true
   jpa:
-    spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-        ddl-auto: create
+        ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database: h2
 
