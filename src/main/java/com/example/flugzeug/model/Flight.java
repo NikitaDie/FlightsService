@@ -2,75 +2,76 @@ package com.example.flugzeug.model;
 
 import com.example.flugzeug.exception.NotAvailableException;
 import com.example.flugzeug.exception.WrongPositionException;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 
 import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
+@Getter
+@Entity
+@Table(name = "flights")
 public class Flight
 {
+    @Id
+    @GeneratedValue
     private Long id;
+
+    @Setter
     private String name;
 
-    List<Sitplace> sitplaces;
+    @OneToMany(mappedBy="flight", cascade = CascadeType.ALL)
+    private List<Sitplace> seats;
+
+    protected Flight() {}
 
     public Flight(String name, boolean[][] sitsplan)
     {
         this.name = name;
-        sitplaces = new ArrayList<>();
-        InitSitsplan(sitsplan);
+        seats = new ArrayList<>();
+        InitSeatsplan(sitsplan);
     }
 
     public Flight (FlightApi flightApi)
     {
+        this.id = flightApi.getId();
         this.name = flightApi.getName();
-        this.sitplaces = flightApi.getSeats().stream()
+        this.seats = flightApi.getSeats().stream()
                 .map(Sitplace::new)
                 .collect(Collectors.toList());
     }
 
     public FlightApi toApi()
     {
-        return new FlightApi(name, sitplaces);
+        return new FlightApi(id, name, seats);
     }
 
-    public void InitSitsplan(boolean[][] sitzplan)
+    public void InitSeatsplan(boolean[][] seatsplan)
     {
-        for (int i = 0; i < sitzplan.length; ++i)
+        for (int i = 0; i < seatsplan.length; ++i)
         {
-            for (int j = 0; j < sitzplan.length; ++j)
+            for (int j = 0; j < seatsplan.length; ++j)
             {
-                if (sitzplan[i][j])
-                    sitplaces.add(new Sitplace(new Position(i, j)));
+                if (seatsplan[i][j])
+                    seats.add(new Sitplace(new Position(i, j)));
             }
         }
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public int getSomeNumber() {
-        return 42;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public boolean[][] getSitsplan()
+    public boolean[][] getSeatsplan()
     {
-        boolean[][] sitsplan = new boolean[getHeightOfSitsplan() + 1][getLengthOfSitsplan() + 1];
+        boolean[][] seatsplan = new boolean[getHeightOfSitsplan() + 1][getLengthOfSitsplan() + 1];
 
-        sitplaces.stream().forEach(s ->
+        seats.stream().forEach(s ->
         {
            var pos = s.getPosition();
-           sitsplan[pos.getY()][pos.getX()] = s.isReserved();
+            seatsplan[pos.getY()][pos.getX()] = s.isReserved();
         });
 
-        return sitsplan;
+        return seatsplan;
     }
 
     private static void checkInput(int... values)
@@ -84,14 +85,14 @@ public class Flight
 
     public void book(String sitplaceName)
     {
-        Sitplace sitplace = sitplaces.stream().filter(x -> x.getName().equals(sitplaceName)).findFirst().orElse(null);
+        Sitplace sitplace = seats.stream().filter(x -> x.getName().equals(sitplaceName)).findFirst().orElse(null);
         try
         {
             if (sitplace == null)
                 throw new WrongPositionException(sitplaceName);
 
             if (sitplace.isReserved())
-                throw new NotAvailableException(sitplaceName);
+                throw new NotAvailableException("The sit: " + sitplaceName + ", has been already booked.");
 
             sitplace.setReservation(true);
         }
@@ -122,7 +123,7 @@ public class Flight
         short currentFreePlaces = 0;
         List<Short> freePlaces = new ArrayList<>();
 
-        Sitplace[] sitzplaetzeReihe = sitplaces.stream()
+        Sitplace[] sitzplaetzeReihe = seats.stream()
                 .filter(s -> s.getPosition().getY() == reihe)
                 .sorted(Comparator.comparingInt(s -> s.getPosition().getX()))
                 .toArray(Sitplace[]::new);
@@ -142,12 +143,12 @@ public class Flight
 
     private int getLengthOfSitsplan()
     {
-        return Collections.max(sitplaces, Comparator.comparingInt(s -> s.getPosition().getX())).getPosition().getX();
+        return Collections.max(seats, Comparator.comparingInt(s -> s.getPosition().getX())).getPosition().getX() + 1;
     }
 
     private int getHeightOfSitsplan()
     {
-        return Collections.max(sitplaces, Comparator.comparingInt(s -> s.getPosition().getY())).getPosition().getY();
+        return Collections.max(seats, Comparator.comparingInt(s -> s.getPosition().getY())).getPosition().getY() + 1;
     }
 
 

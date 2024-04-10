@@ -1,12 +1,19 @@
 package com.example.flugzeug.service;
 
+import com.example.flugzeug.exception.NotAvailableException;
+import com.example.flugzeug.model.Flight;
 import com.example.flugzeug.model.FlightApi;
 import com.example.flugzeug.repository.FlightRepository;
+import jakarta.annotation.Nullable;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Primary
@@ -19,43 +26,68 @@ public class FlightService implements IFlightService
     @Override
     public List<FlightApi> getAllFlights()
     {
-        return flightRepository.findAll();
+        return flightRepository.findAll().stream()
+                .map(Flight::toApi)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void createFlight(FlightApi flight)
+    public void createFlight(FlightApi flightApi)
     {
+        Flight checkFlight = getFlightByName(flightApi.getName());
+            if (checkFlight != null && !Objects.equals(checkFlight.getId(), flightApi.getId()))
+                throw new NotAvailableException("Flight with Name: " + flightApi.getName() +  " ,already exists");
+
+        Flight flight = new Flight(flightApi);
+        for (var seat : flight.getSeats())
+            seat.setFlight(flight);
         flightRepository.save(flight);
     }
 
-    @Override
-    public FlightApi getFlightByName(String name)
+    @Nullable
+    private Flight getFlightByName(String name)
     {
         return flightRepository.findFlightApiByName(name);
     }
 
     @Override
-    public boolean updateFlight(FlightApi flight)
+    public FlightApi getFlightApiByName(String name)
     {
-        flightRepository.save(flight);
-        return true;//TODO
+        Flight flight = flightRepository.findFlightApiByName(name);
+        if (flight == null)
+            throw new EntityNotFoundException(String.format("Flight was not found for parameters {name=%s}", name));
+
+        return flight.toApi();
     }
 
     @Override
-    public boolean deleteFlight(String name)
+    public void updateFlight(FlightApi flightApi)
     {
+        createFlight(flightApi);
+    }
+
+    @Override
+    @Transactional
+    public void deleteFlight(String name)
+    {
+        Flight flight = flightRepository.findFlightApiByName(name);
+        if (flight == null)
+            throw new EntityNotFoundException(String.format("Flight was not found during deleting for parameters {name=%s}", name));
+
         flightRepository.deleteByName(name);
-        return true;//TODO
     }
 
     @Override
     public void bookFlight(String flightName, String sitplaceName)
     {
-
+       Flight flight = new Flight(getFlightApiByName(flightName));
+       flight.book(sitplaceName);
+       updateFlight(flight.toApi());
     }
 
     @Override
     public int[] GetMatchingRows(String flightName, int placesInRow) {
-        return new int[0];
+        Flight flight = getFlightByName(flightName);
+        return flight.findMatchingRows(placesInRow);
     }
 }

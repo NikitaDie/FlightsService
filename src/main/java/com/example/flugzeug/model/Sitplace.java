@@ -1,10 +1,27 @@
 package com.example.flugzeug.model;
 
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+@Entity
+@Table(name = "seats")
 public class Sitplace
 {
-    private final String name;
+    @Id
+    @Getter
+    private String name;
 
+    @Column(columnDefinition = "boolean")
     private boolean isReserved;
+
+    @Id
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "flight_id", nullable = false)
+    private Flight flight;
+
+    protected Sitplace() { }
 
     Sitplace(Position position)
     {
@@ -17,8 +34,9 @@ public class Sitplace
         this.isReserved = sitplaceApi.isReserved();
     }
 
-    public String getName() {
-        return name;
+    public SitplaceApi toApi()
+    {
+        return new SitplaceApi(name, isReserved);
     }
 
     public boolean isReserved() {

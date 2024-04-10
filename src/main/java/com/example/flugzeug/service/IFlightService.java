@@ -10,9 +10,9 @@ public interface IFlightService
     public List<FlightApi> getAllFlights();
 
     public void createFlight(FlightApi flight);
-    public FlightApi getFlightByName(String name);
-    public boolean updateFlight(FlightApi flight);
-    public boolean deleteFlight(String name);
+    public FlightApi getFlightApiByName(String name);
+    public void updateFlight(FlightApi flight);
+    public void deleteFlight(String name);
     public void bookFlight(String flightName, String sitplaceName);
     public int[] GetMatchingRows(String flightName, int placesInRow);
 }

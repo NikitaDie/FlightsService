@@ -7,8 +7,8 @@ public class NotAvailableException extends FlightsException
         super("Sitz ist schon besetzt.");
     }
 
-    public NotAvailableException(String position)
+    public NotAvailableException(String message)
     {
-        super("Sitz: " + position + " ist schon besetzt.");
+        super(message);
     }
 }

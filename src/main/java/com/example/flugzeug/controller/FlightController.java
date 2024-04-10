@@ -1,16 +1,10 @@
 package com.example.flugzeug.controller;
 
-import com.example.flugzeug.exception.NotAvailableException;
-import com.example.flugzeug.exception.WrongPositionException;
 import com.example.flugzeug.model.FlightApi;
 import com.example.flugzeug.service.IFlightService;
-import com.example.flugzeug.service.InMemoryFlightService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.security.InvalidParameterException;
 import java.util.List;
 
 @RestController
@@ -36,67 +30,32 @@ public class FlightController
     @ResponseBody
     public FlightApi getFlight(@PathVariable String flightName)
     {
-        var response = service.getFlightByName(flightName);
-        if (response != null)
-            return response;
-
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        return service.getFlightApiByName(flightName);
     }
 
     @PutMapping("/update-flight")
     public void updateFlight(@RequestBody FlightApi updatedFlight)
     {
-        if (!service.updateFlight(updatedFlight))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        service.updateFlight(updatedFlight);
     }
 
     @DeleteMapping("/{flightName}")
     public void deleteFlight(@PathVariable String flightName)
     {
-        if (!service.deleteFlight(flightName))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        service.deleteFlight(flightName);
     }
 
 
     @PutMapping("book/{flightName}")
     public void bookFlight(@PathVariable String flightName, @RequestParam String sitplace)
     {
-        try {
-            service.bookFlight(flightName, sitplace);
-        } catch (Exception e) {
-            if (e instanceof WrongPositionException)
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, e.getMessage()
-                );
-
-            if (e instanceof NotAvailableException)
-                throw new ResponseStatusException(
-                        HttpStatus.CONFLICT, e.getMessage()
-                );
-
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage()
-            );
-        }
+        service.bookFlight(flightName, sitplace);
     }
 
     @GetMapping("/{flightName}/free-rows")
     public int[] GetMatchingRows(@PathVariable String flightName, @RequestParam int placesInRow)
     {
-        try {
-            return service.GetMatchingRows(flightName, placesInRow);
-        }
-        catch (Exception e)
-        {
-            if (e instanceof InvalidParameterException)
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, e.getMessage()
-                );
-
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage()
-            );
-        }
+        return service.GetMatchingRows(flightName, placesInRow);
     }
 
 }
