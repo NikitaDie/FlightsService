@@ -47,15 +47,24 @@ public class FlightService implements IFlightService
     @Nullable
     private Flight getFlightByName(String name)
     {
-        return flightRepository.findFlightApiByName(name);
+        return flightRepository.findFlightByName(name);
     }
 
     @Override
     public FlightApi getFlightApiByName(String name)
     {
-        Flight flight = flightRepository.findFlightApiByName(name);
+        Flight flight = flightRepository.findFlightByName(name);
         if (flight == null)
             throw new EntityNotFoundException(String.format("Flight was not found for parameters {name=%s}", name));
+
+        return flight.toApi();
+    }
+
+    @Override
+    public FlightApi getFlightApiById(long id) {
+        Flight flight = flightRepository.findFlightById(id);
+        if (flight == null)
+            throw new EntityNotFoundException(String.format("Flight was not found for parameters {id=%s}", id));
 
         return flight.toApi();
     }
@@ -70,7 +79,7 @@ public class FlightService implements IFlightService
     @Transactional
     public void deleteFlight(String name)
     {
-        Flight flight = flightRepository.findFlightApiByName(name);
+        Flight flight = flightRepository.findFlightByName(name);
         if (flight == null)
             throw new EntityNotFoundException(String.format("Flight was not found during deleting for parameters {name=%s}", name));
 

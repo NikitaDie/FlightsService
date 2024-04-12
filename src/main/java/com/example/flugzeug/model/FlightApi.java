@@ -13,6 +13,8 @@ public class FlightApi
     private Long id;
     private String name;
     private List<SitplaceApi> seats;
+    private int totalSeatsCount;
+    private int bookedSeatsCount;
 
     public FlightApi(Long id, String name, List<Sitplace> seats)
     {
@@ -21,5 +23,7 @@ public class FlightApi
         this.seats = seats.stream()
                 .map(Sitplace::toApi)
                 .collect(Collectors.toList());
+        totalSeatsCount = seats.size();
+        bookedSeatsCount = (int) seats.stream().filter(Sitplace::isReserved).count();
     }
 }

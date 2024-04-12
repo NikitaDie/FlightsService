@@ -28,12 +28,12 @@ public class Flight
 
     protected Flight() {}
 
-    public Flight(String name, boolean[][] sitsplan)
+    /*public Flight(String name, boolean[][] sitsplan)
     {
         this.name = name;
         seats = new ArrayList<>();
         InitSeatsplan(sitsplan);
-    }
+    }*/
 
     public Flight (FlightApi flightApi)
     {
@@ -49,7 +49,7 @@ public class Flight
         return new FlightApi(id, name, seats);
     }
 
-    public void InitSeatsplan(boolean[][] seatsplan)
+    /*public void InitSeatsplan(boolean[][] seatsplan)
     {
         for (int i = 0; i < seatsplan.length; ++i)
         {
@@ -72,7 +72,7 @@ public class Flight
         });
 
         return seatsplan;
-    }
+    }*/
 
     private static void checkInput(int... values)
     {

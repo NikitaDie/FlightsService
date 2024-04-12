@@ -12,6 +12,9 @@ public class Sitplace
     @Getter
     private String name;
 
+    private int x;
+    private int y;
+
     @Column(columnDefinition = "boolean")
     private boolean isReserved;
 
@@ -23,20 +26,22 @@ public class Sitplace
 
     protected Sitplace() { }
 
-    Sitplace(Position position)
+    /*Sitplace(Position position)
     {
         name = positionToPlace(position);
-    }
+    }*/
 
     Sitplace(SitplaceApi sitplaceApi)
     {
         this.name = sitplaceApi.getName();
+        this.y = sitplaceApi.getRow();
+        this.x = sitplaceApi.getColumn();
         this.isReserved = sitplaceApi.isReserved();
     }
 
     public SitplaceApi toApi()
     {
-        return new SitplaceApi(name, isReserved);
+        return new SitplaceApi(name, new Position(x, y), isReserved);
     }
 
     public boolean isReserved() {
@@ -51,10 +56,15 @@ public class Sitplace
         return String.format("%d%s", position.getY(), numberToLetter(position.getX()));
     }
 
-    public Position getPosition()
+    /*public Position getPosition()
     {
         int x = LetterToNumber(name.charAt(1));
         int y = name.charAt(0) - '0';
+        return new Position(x, y);
+    }*/
+
+    public Position getPosition()
+    {
         return new Position(x, y);
     }
 
@@ -68,5 +78,4 @@ public class Sitplace
         final int Alphabetlaenge = 25;
         return (char) ('A' + (i % Alphabetlaenge));
     }
-
 }

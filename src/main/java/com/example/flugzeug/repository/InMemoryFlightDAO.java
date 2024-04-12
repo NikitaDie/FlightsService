@@ -13,9 +13,7 @@ import java.util.stream.IntStream;
 @Repository
 public class InMemoryFlightDAO
 {
-    private final List<Flight> FLIGHTS = new ArrayList<>(Arrays.asList(
-            new Flight("A380", new boolean[][]{{true, false},{true, true}})
-    ));
+    private final List<Flight> FLIGHTS = new ArrayList<>();
 
     public List<Flight> getAllFlights() {
     return FLIGHTS;

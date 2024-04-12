@@ -35,6 +35,11 @@ public class InMemoryFlightService implements IFlightService
     }
 
     @Override
+    public FlightApi getFlightApiById(long id) {
+        return null;
+    }
+
+    @Override
     public void updateFlight(FlightApi flight)
     {
         repository.updateFlight(new Flight(flight));

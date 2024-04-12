@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v1/flights")
 public class FlightController
@@ -26,11 +27,11 @@ public class FlightController
         service.createFlight(newFlight);
     }
 
-    @GetMapping("/{flightName}")
+    @GetMapping("/{flightId}")
     @ResponseBody
-    public FlightApi getFlight(@PathVariable String flightName)
+    public FlightApi getFlight(@PathVariable Long flightId)
     {
-        return service.getFlightApiByName(flightName);
+        return service.getFlightApiById(flightId);
     }
 
     @PutMapping

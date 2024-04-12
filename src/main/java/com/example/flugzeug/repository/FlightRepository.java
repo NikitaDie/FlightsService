@@ -9,5 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface FlightRepository extends JpaRepository<Flight, Long>
 {
     void deleteByName(String name);
-    Flight findFlightApiByName(String name);
+    Flight findFlightByName(String name);
+    Flight findFlightById(Long id);
 }
