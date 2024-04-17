@@ -9,6 +9,9 @@ import lombok.Setter;
 public class Sitplace
 {
     @Id
+    @GeneratedValue
+    private Long id;
+
     @Getter
     private String name;
 
@@ -18,7 +21,6 @@ public class Sitplace
     @Column(columnDefinition = "boolean")
     private boolean isReserved;
 
-    @Id
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "flight_id", nullable = false)
@@ -33,6 +35,7 @@ public class Sitplace
 
     Sitplace(SitplaceApi sitplaceApi)
     {
+        this.id = sitplaceApi.getId();
         this.name = sitplaceApi.getName();
         this.y = sitplaceApi.getRow();
         this.x = sitplaceApi.getColumn();
@@ -41,7 +44,7 @@ public class Sitplace
 
     public SitplaceApi toApi()
     {
-        return new SitplaceApi(name, new Position(x, y), isReserved);
+        return new SitplaceApi(id, name, new Position(x, y), isReserved);
     }
 
     public boolean isReserved() {
