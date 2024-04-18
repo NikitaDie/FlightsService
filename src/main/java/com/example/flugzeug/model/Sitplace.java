@@ -4,11 +4,16 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 @Entity
-@Table(name = "seats")
+@Table(name = "seats",
+        uniqueConstraints = { @UniqueConstraint(columnNames = {"name", "flight_id"}) })
 public class Sitplace
 {
     @Id
+    @Getter
+    @Setter
     @GeneratedValue
     private Long id;
 
@@ -21,10 +26,13 @@ public class Sitplace
     @Column(columnDefinition = "boolean")
     private boolean isReserved;
 
-    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "flight_id", nullable = false)
     private Flight flight;
+
+    public void setFlight(Flight flight) {
+        this.flight = flight;
+    }
 
     protected Sitplace() { }
 
@@ -80,5 +88,18 @@ public class Sitplace
     {
         final int Alphabetlaenge = 25;
         return (char) ('A' + (i % Alphabetlaenge));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Sitplace sitplace = (Sitplace) o;
+        return x == sitplace.x && y == sitplace.y && isReserved == sitplace.isReserved && Objects.equals(id, sitplace.id) && Objects.equals(name, sitplace.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, x, y, isReserved);
     }
 }

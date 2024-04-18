@@ -3,7 +3,9 @@ package com.example.flugzeug.service;
 import com.example.flugzeug.exception.NotAvailableException;
 import com.example.flugzeug.model.Flight;
 import com.example.flugzeug.model.FlightApi;
+import com.example.flugzeug.model.Sitplace;
 import com.example.flugzeug.repository.FlightRepository;
+import com.example.flugzeug.repository.SeatRepository;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -11,8 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +25,9 @@ public class FlightService implements IFlightService
 {
     @Autowired
     private FlightRepository flightRepository;
+
+    @Autowired
+    private SeatRepository seatRepository;
 
 
     @Override
@@ -41,6 +48,7 @@ public class FlightService implements IFlightService
         Flight flight = new Flight(flightApi);
         for (var seat : flight.getSeats())
             seat.setFlight(flight);
+
         flightRepository.save(flight);
     }
 
@@ -72,7 +80,34 @@ public class FlightService implements IFlightService
     @Override
     public void updateFlight(FlightApi flightApi)
     {
-        createFlight(flightApi);
+        Flight checkFlight = getFlightByName(flightApi.getName());
+
+        List<Sitplace> changedSeats = new ArrayList<>();
+
+        //createFlight(flightApi);
+        Flight flight = new Flight(flightApi);
+        for (Sitplace seat : flight.getSeats()) {
+
+            Optional<Sitplace> oldSeat = checkFlight.getSeats()
+                    .stream()
+                    .filter(s -> s.getName().equals(seat.getName()))
+                    .findFirst();
+
+            if (oldSeat.isPresent())
+            {
+                if (oldSeat.get().equals(seat))
+                    continue;
+                else
+                {
+                    seatRepository.customDeleteById(oldSeat.get().getId());
+                    seatRepository.flush();
+                }
+            }
+
+            //seat.setId(null);
+            seat.setFlight(flight);
+            seatRepository.save(seat);
+        }
     }
 
     @Override
