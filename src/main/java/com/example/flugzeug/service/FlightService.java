@@ -86,13 +86,14 @@ public class FlightService implements IFlightService
                         .thenComparingInt(SitplaceApi::getColumn).reversed()).toList();
         flightApi.setSeats(sortedSeats);
 
+        createFlight(flightApi);
+
         var oldFlight = flightRepository.findFlightById(flightApi.getId());
         var seats = flightApi.getSeats().stream().map(Sitplace::new).toList();
 
-        updateSeats(oldFlight, seats);
+        flightApi.setSeats(new ArrayList<>());
+        updateSeats(oldFlight, new ArrayList<>());
         deleteSeats(oldFlight, seats);
-
-        //createFlight(flightApi);
 //        Flight flight = new Flight(flightApi);
 //
 //        List<Sitplace> sortedSeats = flight.getSeats().stream()
@@ -131,7 +132,8 @@ public class FlightService implements IFlightService
                         .thenComparingInt(Sitplace::getY).reversed()).toList();
 
         Map<String, Sitplace> seatMap = new HashMap<>();
-        oldFlight.getSeats().forEach(seat -> seatMap.put(seat.getName(), seat));
+        if (oldFlight != null)
+            oldFlight.getSeats().forEach(seat -> seatMap.put(seat.getName(), seat));
 
         for (Sitplace seat : sortedSeats) {
             Sitplace oldSeat = seatMap.get(seat.getName());
@@ -148,6 +150,9 @@ public class FlightService implements IFlightService
 
     protected void deleteSeats(Flight oldFlight, List<Sitplace> newSeats)
     {
+        if(oldFlight == null)
+            return;
+
         Map<Long, Sitplace> newSeatMap = newSeats.stream()
                 .collect(Collectors.toMap(Sitplace::getId, Function.identity()));
 

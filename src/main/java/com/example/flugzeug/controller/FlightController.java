@@ -34,6 +34,13 @@ public class FlightController
         return service.getFlightApiById(flightId);
     }
 
+    @GetMapping("/{name}")
+    @ResponseBody
+    public FlightApi getFlight(@PathVariable String name)
+    {
+        return service.getFlightApiByName(name);
+    }
+
     @PutMapping
     public void updateFlight(@RequestBody FlightApi updatedFlight)
     {

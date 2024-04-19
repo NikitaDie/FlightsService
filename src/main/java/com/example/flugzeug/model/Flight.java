@@ -24,7 +24,7 @@ public class Flight
     private String name;
 
     @Setter
-    @OneToMany(mappedBy="flight", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="flight", cascade = CascadeType.DETACH)
     private List<Sitplace> seats;
 
     protected Flight() {}
