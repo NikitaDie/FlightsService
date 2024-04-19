@@ -4,6 +4,7 @@ import com.example.flugzeug.exception.NotAvailableException;
 import com.example.flugzeug.model.Flight;
 import com.example.flugzeug.model.FlightApi;
 import com.example.flugzeug.model.Sitplace;
+import com.example.flugzeug.model.SitplaceApi;
 import com.example.flugzeug.repository.FlightRepository;
 import com.example.flugzeug.repository.SeatRepository;
 import jakarta.annotation.Nullable;
@@ -13,10 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -80,34 +79,83 @@ public class FlightService implements IFlightService
     @Override
     public void updateFlight(FlightApi flightApi)
     {
-        Flight checkFlight = getFlightByName(flightApi.getName());
+//        Flight checkFlight = getFlightByName(flightApi.getName());
 
-        List<Sitplace> changedSeats = new ArrayList<>();
+        List<SitplaceApi> sortedSeats = flightApi.getSeats().stream()
+                .sorted(Comparator.comparingInt(SitplaceApi::getRow)
+                        .thenComparingInt(SitplaceApi::getColumn).reversed()).toList();
+        flightApi.setSeats(sortedSeats);
+
+        var oldFlight = flightRepository.findFlightById(flightApi.getId());
+        var seats = flightApi.getSeats().stream().map(Sitplace::new).toList();
+
+        updateSeats(oldFlight, seats);
+        deleteSeats(oldFlight, seats);
 
         //createFlight(flightApi);
-        Flight flight = new Flight(flightApi);
-        for (Sitplace seat : flight.getSeats()) {
+//        Flight flight = new Flight(flightApi);
+//
+//        List<Sitplace> sortedSeats = flight.getSeats().stream()
+//                .sorted(Comparator.comparingInt((Sitplace seat) -> seat.getPosition().getX())
+//                        .thenComparingInt(seat -> seat.getPosition().getY()).reversed()).toList();
+//
+//        flight.setSeats(sortedSeats);
+//
+//        for (Sitplace seat : flight.getSeats()) {
+//
+//            Optional<Sitplace> oldSeat = checkFlight.getSeats()
+//                    .stream()
+//                    .filter(s -> s.getName().equals(seat.getName()))
+//                    .findFirst();
+//
+//            if (oldSeat.isPresent())
+//            {
+//                if (oldSeat.get().equals(seat))
+//                    continue;
+////                else
+////                {
+////                    seatRepository.customDeleteById(oldSeat.get().getId());
+////                    seatRepository.flush();
+////                }
+//            }
+//
+//            seat.setFlight(flight);
+//            seatRepository.save(seat);
+//        }
+    }
 
-            Optional<Sitplace> oldSeat = checkFlight.getSeats()
-                    .stream()
-                    .filter(s -> s.getName().equals(seat.getName()))
-                    .findFirst();
+    private void updateSeats(Flight oldFlight, List<Sitplace> newSeats) {
 
-            if (oldSeat.isPresent())
-            {
-                if (oldSeat.get().equals(seat))
-                    continue;
-                else
-                {
-                    seatRepository.customDeleteById(oldSeat.get().getId());
-                    seatRepository.flush();
-                }
+        List<Sitplace> sortedSeats = newSeats.stream()
+                .sorted(Comparator.comparingInt(Sitplace::getX)
+                        .thenComparingInt(Sitplace::getY).reversed()).toList();
+
+        Map<String, Sitplace> seatMap = new HashMap<>();
+        oldFlight.getSeats().forEach(seat -> seatMap.put(seat.getName(), seat));
+
+        for (Sitplace seat : sortedSeats) {
+            Sitplace oldSeat = seatMap.get(seat.getName());
+
+            if (oldSeat != null && oldSeat.equals(seat)) {
+                continue;
             }
 
-            //seat.setId(null);
-            seat.setFlight(flight);
+            seat.setFlight(oldFlight);
             seatRepository.save(seat);
         }
+
+    }
+
+    protected void deleteSeats(Flight oldFlight, List<Sitplace> newSeats)
+    {
+        Map<Long, Sitplace> newSeatMap = newSeats.stream()
+                .collect(Collectors.toMap(Sitplace::getId, Function.identity()));
+
+        oldFlight.getSeats().forEach(seat -> {
+            if (!newSeatMap.containsKey(seat.getId())) {
+                seatRepository.customDeleteById(seat.getId());
+            }
+        });
     }
 
     @Override

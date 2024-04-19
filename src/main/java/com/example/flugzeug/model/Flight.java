@@ -23,6 +23,7 @@ public class Flight
     @Setter
     private String name;
 
+    @Setter
     @OneToMany(mappedBy="flight", cascade = CascadeType.ALL)
     private List<Sitplace> seats;
 

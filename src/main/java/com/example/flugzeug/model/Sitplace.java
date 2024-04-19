@@ -7,8 +7,9 @@ import lombok.Setter;
 import java.util.Objects;
 
 @Entity
-@Table(name = "seats",
-        uniqueConstraints = { @UniqueConstraint(columnNames = {"name", "flight_id"}) })
+//@Table(name = "seats",
+//        uniqueConstraints = { @UniqueConstraint(columnNames = {"name", "flight_id"}) })
+@Table(name = "seats")
 public class Sitplace
 {
     @Id
@@ -20,7 +21,9 @@ public class Sitplace
     @Getter
     private String name;
 
+    @Getter
     private int x;
+    @Getter
     private int y;
 
     @Column(columnDefinition = "boolean")
@@ -41,7 +44,7 @@ public class Sitplace
         name = positionToPlace(position);
     }*/
 
-    Sitplace(SitplaceApi sitplaceApi)
+    public Sitplace(SitplaceApi sitplaceApi)
     {
         this.id = sitplaceApi.getId();
         this.name = sitplaceApi.getName();
